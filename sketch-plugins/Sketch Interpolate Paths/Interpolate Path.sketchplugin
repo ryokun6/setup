@@ -1,0 +1,198 @@
+
+/**
+ * Interpolate Path
+ * Given two selected paths and a number of steps to perform, this plugin will
+ * generate intermediate paths s.t. the first path transforms into the second
+ * one step by step.
+ *
+ * This is my first Sketch Plugin and the Sketch API is a huge undocumented
+ * mess. It might take a while until this plugin works properly... right now
+ * it kind of works sometimes, but it's still full of bugs.
+ *
+ * @author Martin Matysiak (kaktus621@gmail.com)
+ */
+
+
+/**
+ * Interpolates a single point of a path. Makes sure that curvePoints are
+ * correctly combined if either {a} or {b} is an uncurved point.
+ */
+function interpolatePoint(a, b, interpolator) {
+  return {
+    x: interpolator(a.x, b.x),
+    y: interpolator(a.y, b.y)
+  };
+}
+
+
+/**
+ * Performs the interpolation of {a} and {b} using interpolation function
+ * {interpolator} and stores the interpolated points in {path}.
+ */
+function interpolatePaths(path, a, b, interpolator) {
+  for (var i = 0; i < path.path().points().count(); i++) {
+    var point = path.path().points().objectAtIndex(i);
+    var aP = a.path().points().objectAtIndex(i);
+    var bP = b.path().points().objectAtIndex(i);
+
+    var curveFrom = interpolatePoint(
+        aP.curveFrom() || aP.point(),
+        bP.curveFrom() || bP.point(),
+        interpolator);
+
+    var p = interpolatePoint(aP.point(), bP.point(), interpolator);
+
+    var curveTo = interpolatePoint(
+        aP.curveTo() || aP.point(),
+        bP.curveTo() || bP.point(),
+        interpolator);
+
+    point.movePointTo(p);
+    point.setCurveFrom(curveFrom);
+    point.setCurveTo(curveTo);
+
+  }
+}
+
+
+/**
+ * All parameters except interpolator are of the type MSGraphicsContextSettings.
+ */
+function interpolateContextSettings(clone, start, target, interpolator) {
+  clone.setOpacity(interpolator(start.opacity(), target.opacity()));
+}
+
+
+/**
+ * Interpolates the border styles of the paths.
+ * All parameters except interpolator are of the type MSBorderStyleCollection.
+ */
+function interpolateBorders(clone, start, target, interpolator) {
+  for (var i = 0; i < clone.count(); i++) {
+    var c = clone.objectAtIndex(i);
+    var s = start.objectAtIndex(i);
+    var t = target.objectAtIndex(i);
+
+    c.setThickness(interpolator(s.thickness(), t.thickness()));
+    interpolateContextSettings(c.contextSettings(), s.contextSettings(),
+        t.contextSettings(), interpolator)
+  }
+}
+
+// Dump Object, taken from github.com/sketchplugins/plugin-requests
+function dump(obj){
+  log("######################################")
+  log("## Dumping object " + obj )
+  log("## obj class is: " + [obj className])
+  log("######################################")
+
+  log("obj.properties:")
+  log([obj class].mocha().properties())
+  log("obj.propertiesWithAncestors:")
+  log([obj class].mocha().propertiesWithAncestors())
+
+  log("obj.classMethods:")
+  log([obj class].mocha().classMethods())
+  log("obj.classMethodsWithAncestors:")
+  log([obj class].mocha().classMethodsWithAncestors())
+
+  log("obj.instanceMethods:")
+  log([obj class].mocha().instanceMethods())
+  log("obj.instanceMethodsWithAncestors:")
+  log([obj class].mocha().instanceMethodsWithAncestors())
+
+  log("obj.protocols:")
+  log([obj class].mocha().protocols())
+  log("obj.protocolsWithAncestors:")
+  log([obj class].mocha().protocolsWithAncestors())
+
+  log("obj.treeAsDictionary():")
+  log(obj.treeAsDictionary())
+}
+
+var app = [NSApplication sharedApplication];
+function indicateError(message) {
+  // Note: we'll use exit() to abort the script even though this method does not
+  // exist. This triggers an error message in the log, but that's okay.
+  [app displayDialog:message withTitle:"Interpolate Paths Plugin"];
+  exit();
+}
+
+
+log("%%%%%%%%%%%%%% START %%%%%%%%%%%%%%");
+
+if (selection.count() != 2) {
+  indicateError("Invalid number of objects selected");
+}
+
+var start = selection[0];
+var target = selection[1];
+dump(start);
+dump(target);
+
+if (!(
+  [start isMemberOfClass:[MSShapeGroup class]] &&
+  [target isMemberOfClass:[MSShapeGroup class]] &&
+  [[start layers] count] == 1 &&
+  [[target layers] count] == 1 &&
+  [[[start layers] objectAtIndex:0] isMemberOfClass:[MSShapePathLayer class]] &&
+  [[[target layers] objectAtIndex:0] isMemberOfClass:[MSShapePathLayer class]]
+)) {
+  indicateError("The selected objects must be simple paths");
+}
+
+if (start.layers().objectAtIndex(0).path().points().count() !=
+    target.layers().objectAtIndex(0).path().points().count()) {
+  indicateError("Paths must have same number of points");
+}
+
+var steps = parseInt([doc askForUserInput:"Number of steps" initialValue:10], 10);
+//var steps = 10; // DEBUG //
+var stepSize = 1.0 / (steps + 1);
+
+for (var i = 1; i <= steps; i++) {
+  // duplicate start path
+  var clone = start.duplicate();
+  var lambda = i * stepSize;
+  var interpolator = function(a, b) {
+    return lambda * a + (1 - lambda) * b;
+  }
+
+  // Placeholder because I'm lazy.
+  var c, s, t;
+
+  // Inside the frame the path is using relative coordinates.
+  // To make sure the path is still position correctly with respect to the
+  // document, we will have to reposition and resize the bounding box of the
+  // path accordingly.
+  c = clone.frame();
+  s = start.frame();
+  t = target.frame();
+
+  c.setX(interpolator(s.x(), t.x()));
+  c.setY(interpolator(s.y(), t.y()));
+  c.setWidth(interpolator(s.width(), t.width()));
+  c.setHeight(interpolator(s.height(), t.height()));
+
+  // Interpolate path-level properties
+  c = clone.style();
+  s = start.style();
+  t = target.style();
+
+  if (s.borders().count() != t.borders().count()) {
+    indicateError("Paths must have same number of border styles");
+  }
+
+  interpolateContextSettings(c.contextSettings(), s.contextSettings(),
+      t.contextSettings(), interpolator);
+  interpolateBorders(c.borders(), s.borders(), t.borders(), interpolator);
+
+  // Modify single points of the path according to the interpolator
+  interpolatePaths(clone.layers().objectAtIndex(0),
+      start.layers().objectAtIndex(0),
+      target.layers().objectAtIndex(0),
+      interpolator);
+}
+
+
+

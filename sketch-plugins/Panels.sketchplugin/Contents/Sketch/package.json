@@ -1,0 +1,10 @@
+{
+  "name": "panels",
+  "version": "1.0.0",
+  "devDependencies": {
+    "coffee-script": "^1.10.0",
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "run-sequence": "^1.1.5"
+  }
+}

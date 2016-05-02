@@ -1,0 +1,81 @@
+{
+	"name": "Sketch Palettes",
+	"description": "Plugin to load palettes into color picker",
+	"author": "Andrew Fiorillo",
+	"homepage": "http://github.com/andrewfiorillo/sketch-palettes",
+	"version": "1.1",
+	"identifier": "com.andrewfiorillo.sketch.sketch-palettes",
+	"compatibleVersion": "3.3.3",
+	"bundleVersion": "1.1",
+	"commands": [
+	
+	
+		{
+			"name": "Load Palette...",
+			"identifier": "loadDocumentPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "loadDocumentPalette"
+		},
+		{
+			"name": "Save Palette...",
+			"identifier": "saveDocumentPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "saveDocumentPalette"
+		},
+		{
+			"name": "Clear Palette",
+			"identifier": "clearDocumentPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "clearDocumentPalette"
+		},
+		
+		
+		
+		{
+			"name": "Load Palette...",
+			"identifier": "loadGlobalPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "loadGlobalPalette"
+		},
+		{
+			"name": "Save Palette...",
+			"identifier": "saveGlobalPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "saveGlobalPalette"
+		},
+		{
+			"name": "Clear Palette",
+			"identifier": "clearGlobalPalette",
+			"shortcut": "",
+			"script": "sketchPalettes.js",
+			"handler": "clearGlobalPalette"
+		}
+		
+		
+	],
+	"menu": {
+		"items": [
+			{
+				"title": "Document Colors",
+				"items": [
+					"loadDocumentPalette",
+					"saveDocumentPalette",
+					"clearDocumentPalette"
+				],
+			},
+			{
+				"title": "Global Colors",
+				"items": [
+					"loadGlobalPalette",
+					"saveGlobalPalette",
+					"clearGlobalPalette"
+				],
+			}
+		]
+	}
+}
