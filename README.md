@@ -1,6 +1,12 @@
 # Workspace Setup
 Config and scripts for a setting up new Mac.
 
+## Setup Surge proxy (China-only)
+1. Install [Surge](http://surge.run/Surge-Mac.zip)
+2. Copy config file to `~/.surge.conf`
+3. Activate Surge with iPhone
+4. Copy Surge `export` to Terminal
+
 ## Install Homebrew and essential packages
 
 1. Install Homebrew
@@ -62,26 +68,25 @@ $ cp Terminal/.zshrc ~
 ## Web Development
 
 ### Text editor
-- Atom: https://atom.io/download/mac
+- [Atom](https://atom.io/download/mac)
 - Atom packages: `emmet pigments minimap spacegray-dark-neue-syntax`
 
 ### Static web server
-- Anvil/pow.cx: http://anvilformac.com/
+- [Anvil/pow.cx](http://anvilformac.com/)
 
 ## Design
 
 ### Design tools
-- Sketch: https://www.sketchapp.com/static/download/sketch.zip
-- Framer: http://framerjs.com/download/
-- Origami: https://facebook.github.io/origami/
-- Adobe CC: https://creative.adobe.com/products/download/creative-cloud
-- Wacom Driver: http://cdn.wacom.com/u/productsupport/drivers/mac/professional/WacomTablet_6.3.15-3.dmg
-- Craft: https://www.invisionapp.com/craft
+- [Sketch](https://www.sketchapp.com/static/download/sketch.zip)
+- [Framer](http://framerjs.com/download/)
+- [Origami](https://facebook.github.io/origami/)
+- [Adobe CC](https://creative.adobe.com/products/download/creative-cloud)
+- [Wacom Driver](http://cdn.wacom.com/u/productsupport/drivers/mac/professional/WacomTablet_6.3.15-3.dmg)
+- [Craft](https://www.invisionapp.com/craft)
 
-### Icon libraries
-- Nucleo: https://dl.devmate.com/co.ambercreative.Nucleoapp/Nucleo.zip
-- Noun Project: https://thenounproject.com/for-mac/download/
-- Icomoon: https://icomoon.io
+### Icon managers and libraries
+- [Nucleo](https://dl.devmate.com/co.ambercreative.Nucleoapp/Nucleo.zip)
+- [Noun Project](https://thenounproject.com/for-mac/download/)
 
 ### Font Managers
 - RightFont
