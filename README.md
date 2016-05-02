@@ -10,33 +10,33 @@ Config and scripts for a setting up new Mac.
 ## Install Homebrew and essential packages
 
 1. Install Homebrew
-```bash
-$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-$ brew update
-```
+  ```bash
+  $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  $ brew update
+  ```
 
 2. Install `nvm`
-```bash
-$ brew install nvm
-$ echo "source $(brew --prefix nvm)/nvm.sh" >> .zshrc
-```
+  ```bash
+  $ brew install nvm
+  $ echo "source $(brew --prefix nvm)/nvm.sh" >> .zshrc
+  ```
 
 3. Install `node` with `nvm`
-```bash
-$ nvm ls-remote
-$ nvm install <version>
-$ nvm alias default <version>
-```
+  ```bash
+  $ nvm ls-remote
+  $ nvm install <version>
+  $ nvm alias default <version>
+  ```
 
 4. Install `git`
-```bash
-$ brew install git
-```
+  ```bash
+  $ brew install git
+  ```
 
 5. Install `npm` packages
-```bash
-$ npm install -g bower browser-sync foundation-cli gulp mupx yo static-i18n gatsby babel
-```
+  ```bash
+  $ npm install -g bower browser-sync foundation-cli gulp mupx yo static-i18n gatsby babel
+  ```
 
 ## A Nice Looking Terminal
 
