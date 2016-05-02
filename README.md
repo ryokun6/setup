@@ -84,7 +84,7 @@ Config and scripts for a setting up new Mac.
 - [Wacom Driver](http://cdn.wacom.com/u/productsupport/drivers/mac/professional/WacomTablet_6.3.15-3.dmg)
 - [Craft](https://www.invisionapp.com/craft)
 
-### Copy Sketch Plugins
+### Copy Sketch plugins
 ```bash
 cp -r sketch-plugins/ ~/Library/Application\ Support/com.bohemiancoding.sketch3/Plugins/
 ```
