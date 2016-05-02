@@ -40,28 +40,28 @@ Config and scripts for a setting up new Mac.
 
 ## A Nice Looking Terminal
 
-1. Download iTerm2 from https://www.iterm2.com/downloads.html
+1. Download [iTerm2](https://www.iterm2.com/downloads.html)
 
 2. Install `zsh`
-```bash
-$ brew install zsh
-```
+  ```bash
+  $ brew install zsh
+  ```
 
 3. Set Homebrew `zsh` as default shell
-```bash
-$ sudo vim /etc/shells
-$ chsh -s /usr/local/bin/zsh
-```
+  ```bash
+  $ sudo vim /etc/shells
+  $ chsh -s /usr/local/bin/zsh
+  ```
 
 4. Install `omyzsh`
-```bash
-$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-```
+  ```bash
+  $ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+  ```
 
 5. Copy `zsh` config file
-```bash
-$ cp Terminal/.zshrc ~
-```
+  ```bash
+  $ cp terminal/.zshrc ~
+  ```
 
 6. Set iTerm2 color palette and font settings
 
@@ -83,6 +83,11 @@ $ cp Terminal/.zshrc ~
 - [Adobe CC](https://creative.adobe.com/products/download/creative-cloud)
 - [Wacom Driver](http://cdn.wacom.com/u/productsupport/drivers/mac/professional/WacomTablet_6.3.15-3.dmg)
 - [Craft](https://www.invisionapp.com/craft)
+
+### Copy Sketch Plugins
+```bash
+cp -r sketch-plugins/ ~/Library/Application\ Support/com.bohemiancoding.sketch3/Plugins/
+```
 
 ### Icon managers and libraries
 - [Nucleo](https://dl.devmate.com/co.ambercreative.Nucleoapp/Nucleo.zip)
