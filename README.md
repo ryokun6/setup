@@ -64,6 +64,11 @@ Config and scripts for a setting up new Mac.
   ```
 
 6. Set iTerm2 color palette and font settings
+- Color palette: Space Gray
+- Font: Sauce Code Powerline
+
+Your terminal should now look like this.
+![iTerm2](images/term.png)
 
 ## Web Development
 
@@ -118,6 +123,7 @@ cp -r sketch-plugins/ ~/Library/Application\ Support/com.bohemiancoding.sketch3/
 - Chrome
 - Dropbox
 - Bartender
+- ScreenFlow
 - Droplr
 - iStat Menus
 - MAMP
