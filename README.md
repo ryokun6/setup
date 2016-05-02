@@ -11,31 +11,31 @@ Config and scripts for a setting up new Mac.
 
 1. Install Homebrew
   ```bash
-  $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  $ brew update
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  brew update
   ```
 
 2. Install `nvm`
   ```bash
-  $ brew install nvm
-  $ echo "source $(brew --prefix nvm)/nvm.sh" >> .zshrc
+  brew install nvm
+  echo "source $(brew --prefix nvm)/nvm.sh" >> .zshrc
   ```
 
 3. Install `node` with `nvm`
   ```bash
-  $ nvm ls-remote
-  $ nvm install <version>
-  $ nvm alias default <version>
+  nvm ls-remote
+  nvm install <version>
+  nvm alias default <version>
   ```
 
 4. Install `git`
   ```bash
-  $ brew install git
+  brew install git
   ```
 
 5. Install `npm` packages
   ```bash
-  $ npm install -g bower browser-sync foundation-cli gulp mupx yo static-i18n gatsby babel
+  npm install -g bower browser-sync foundation-cli gulp mupx yo static-i18n gatsby babel
   ```
 
 ## A Nice Looking Terminal
@@ -44,23 +44,23 @@ Config and scripts for a setting up new Mac.
 
 2. Install `zsh`
   ```bash
-  $ brew install zsh
+  brew install zsh
   ```
 
 3. Set Homebrew `zsh` as default shell
   ```bash
-  $ sudo vim /etc/shells
-  $ chsh -s /usr/local/bin/zsh
+  sudo vim /etc/shells
+  chsh -s /usr/local/bin/zsh
   ```
 
 4. Install `omyzsh`
   ```bash
-  $ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
   ```
 
 5. Copy `zsh` config file
   ```bash
-  $ cp terminal/.zshrc ~
+  cp terminal/.zshrc ~
   ```
 
 6. Set iTerm2 color palette and font settings
