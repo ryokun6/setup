@@ -2,7 +2,7 @@
   "name": "Craft",
   "description": "Craft",
   "author": "InVision LABS",
-  "version": "1.2.4",
+  "version": "1.2.1",
   "identifier": "com.invision.panels",
   "homepage": "http://labs.invisionapp.com/craft",
   "changelog": "http://labs.invisionapp.com/craft-changelog",
@@ -10,10 +10,6 @@
   "icon": "craft.svg",
   "compatibleVersion": 3,
   "commands": [
-	{
-	  "script" : "panels.cocoascript",
-	  "identifier" : "placeholder"
-	},
     {
       "name": "Toggle Craft",
       "identifier": "toggle-panels",

@@ -1,0 +1,145 @@
+var openFolderDialog = function(context) {
+  var doc = context.document;
+  var panelsManager = [PanelsManager sharedManager];
+  var identifier = 'com.invisionlabs.photos';
+  var arguments = [panelsManager commandArguments];
+  var initialFolder = [arguments valueForKey:'initialFolder'];
+
+  var openPanel = [NSOpenPanel openPanel];
+  [openPanel setCanChooseFiles:false];
+  [openPanel setCanChooseDirectories:true];
+  if (initialFolder) {
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:initialFolder isDirectory:true]];
+  }
+  if ([openPanel runModal] == NSFileHandlingPanelOKButton) {
+    var folder = [[[openPanel URLs] lastObject] path];
+    callback(panelsManager, identifier, {folder: folder + ''});
+  }
+};
+
+var runFolder = function(context) {
+  runCommand(context, 'folder');
+};
+
+var runDropbox = function(context) {
+  runCommand(context, 'link');
+};
+
+var runUnsplash = function(context) {
+  runCommand(context, 'unsplash');
+};
+
+var doMagic = function(context) {
+  runCommand(context);
+};
+
+function callback(panelsManager, identifier, data) {
+  var jsonData = JSON.stringify(data);
+  [panelsManager callback:jsonData forIdentifier:identifier];
+}
+
+function errorCallback(panelsManager, identifier, message) {
+  var jsonData = JSON.stringify({
+    error: message
+  });
+  [panelsManager callback:jsonData forIdentifier:identifier];
+}
+
+function filterLayers(layers) {
+  var newLayers = [[NSMutableArray alloc] init];
+
+  for (var i = 0, len = [layers count]; i < len; i++) {
+    var layer = [layers objectAtIndex:i];
+    if ([layer class] != 'MSLayerGroup') {
+      [newLayers addObject:layer];
+    }
+  }
+
+  return newLayers;
+}
+
+function runCommand(context, mode) {
+  var doc = context.document;
+  var command = context.command;
+  var selection = filterLayers(context.selection);
+  var selectionCount = [selection count];
+  var panelsManager = [PanelsManager sharedManager];
+  var identifier = 'com.invisionlabs.photos';
+  var settings = [panelsManager settingsForIdentifier:identifier];
+  if (!mode) {
+    mode = [settings valueForKey:'mode'];
+  }
+  var folderPath = [settings valueForKey:'folder'];
+  var link = [settings valueForKey:'link'];
+  var category = [settings valueForKey:'category'];
+
+  if (selectionCount == 0) {
+    errorCallback(panelsManager, identifier, 'Please select layer. Selecting groups is not supported.');
+    return;
+  }
+
+  var images;
+
+  var selectedLayer = selection[0];
+  [command setValue:[NSDictionary dictionaryWithDictionary:settings] forKey:'photos-duplicate' onLayer:selectedLayer forPluginIdentifier:'com.invisionlabs.duplicate'];
+
+  if (mode == 'link' || mode == 'dropbox') {
+    if (!link) {
+      errorCallback(panelsManager, identifier, 'Please Paste link...');
+      return;
+    }
+    doc.showMessage('Downloading image from Dropbox. It may take some time');
+    return [panelsManager dropbox:link selection:selection identifier:identifier];
+  } else if (mode == 'unsplash') {
+    doc.showMessage('Downloading image from Unsplash. It may take some time');
+    return [panelsManager unsplashWithSelection:selection category:category identifier:identifier];
+  } else {
+    if (!folderPath) {
+      errorCallback(panelsManager, identifier, 'Please Select folder...');
+      return;
+    }
+    var extensions = ['jpg', 'jpeg', 'png', 'tiff', 'bmp', 'JPG', 'JPEG', 'PNG', 'TIFF', 'BMP'];
+    var dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:folderPath error:null];
+    var files = [dirContents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:'pathExtension IN %@', extensions]];
+    images = [files randomSelectionWithCount:selectionCount];
+
+    var error = null;
+    if (!images || [images count] == 0) {
+      error = 'No images to place';
+    } else {
+      var layer, imageName;
+      for (var i = 0; i < selectionCount; i++) {
+        layer = [selection objectAtIndex:i];
+        imageName = [images objectAtIndex:i % [images count]];
+        setFill(layer, folderPath + '/' + imageName);
+      }
+
+    }
+
+    if (error) {
+      errorCallback(panelsManager, identifier, error);
+    } else {
+      callback(panelsManager, identifier, null);
+    }
+  }
+}
+
+function setFill(layer, imagePath) {
+  var imageNS = [[NSImage alloc] initByReferencingFile:imagePath];
+  var style = [layer style];
+  var fill = [style fill];
+  if (!fill) {
+    [[style fills] addNewStylePart];
+  }
+  fill = [style fill];
+
+  [fill setFillType:4];
+  [fill setPatternFillType:1];
+
+  if (fill.setPatternImage_collection == undefined) {
+    [fill setImage:[[MSImageData alloc] initWithImage:imageNS convertColorSpace:false]];
+  } else {
+    var imageCollection = [[fill documentData] images];
+    [fill setPatternImage:imageNS collection:imageCollection];
+  }
+}

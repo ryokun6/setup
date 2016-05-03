@@ -1,0 +1,139 @@
+var IDENTIFIER = 'com.invisionlabs.type';
+
+function filterTextLayers(layers) {
+  var newLayers = []
+
+  for (var i = 0, len = [layers count]; i < len; i++) {
+    var layer = [layers objectAtIndex:i];
+    if ([layer class] == 'MSTextLayer') {
+      newLayers.push(layer)
+    }
+  }
+
+  return newLayers;
+}
+
+function noSelectionAlert() {
+  var alert = [[NSAlert alloc] init];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert setMessageText:'Please select text layer...'];
+  [alert runModal];
+}
+
+function editingTextAlert() {
+  var alert = [[NSAlert alloc] init];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert setMessageText:'You need to exit editing mode before using Type plugin.'];
+  [alert runModal];
+}
+
+function callback(panelsManager, identifier, data) {
+  var jsonData = JSON.stringify(data);
+  [panelsManager callback:jsonData forIdentifier:identifier];
+}
+
+var layersCount = function(context) {
+  var selection = filterTextLayers(context.selection);
+  var selectionCount = selection.length;
+  var panelsManager = [PanelsManager sharedManager];
+  callback(panelsManager, IDENTIFIER, {count: selectionCount});
+};
+
+var fillText = function(context) {
+  var command = context.command;
+  var selection = filterTextLayers(context.selection);
+  var selectionCount = selection.length;
+  var panelsManager = [PanelsManager sharedManager];
+
+  if (selectionCount == 0) {
+    return noSelectionAlert();
+  }
+
+  var selectedLayer = selection[0];
+  if ([selectedLayer isEditingText]) {
+    return editingTextAlert();
+  }
+
+  var arguments = [panelsManager commandArguments];
+  var words = [arguments valueForKey:'words'];
+  var action = [arguments valueForKey:'action'];
+  var isArticle = false;
+
+  if (action) {
+    [command setValue:action forKey:'type-duplicate' onLayer:selectedLayer forPluginIdentifier:'com.invisionlabs.duplicate'];
+    var actionType = [action valueForKey:'action'];
+    if (actionType == 'article') {
+      var options = [action valueForKey:'options'];
+      if (options && [options valueForKey:'type'] == 'body') {
+        isArticle = true;
+      }
+    } else if (actionType == 'khaled') {
+      var options = [action valueForKey:'options'];
+      if (options == 'article') {
+        isArticle = true;
+      }
+    }
+  }
+
+  if (words) {
+    var wordsCount = [words count];
+    var layer, item;
+    for (var i = 0; i < selectionCount; i++) {
+      layer = selection[i];
+      item = [words objectAtIndex:i % wordsCount];
+      setText(layer, item, isArticle);
+      if (isArticle) {
+        setFixed(layer);
+      }
+    }
+  }
+};
+
+function setText(layer, value, isArticle) {
+  var textAlignment;
+  if (isArticle) {
+    textAlignment = [layer textAlignment];
+    [layer setTextAlignment:0];
+  }
+  [layer prepareForUndo];
+  [layer setIsEditingText:true];
+  [layer setStringValue:value];
+  [layer setIsEditingText:false];
+  [layer finishEditing];
+
+  if (isArticle) {
+    [layer setTextAlignment:textAlignment];
+  }
+}
+
+function setFixed(layer) {
+  var artboard = [layer parentArtboard];
+  if (!artboard) {
+    return;
+  }
+
+  var absoluteRect = [layer absoluteRect];
+  var x = [absoluteRect x];
+  var y = [absoluteRect y];
+  var width = [absoluteRect width];
+  var height = [absoluteRect height];
+
+  var artboardRect = [artboard absoluteRect]
+
+  var newWidth = [artboardRect width] - x + [artboardRect x];
+  var newHeight = [artboardRect height] - y + [artboardRect y];
+
+  var rect = [layer rect];
+
+  if (width > newWidth) {
+    rect.size.width = newWidth;
+  }
+
+  if (height > newHeight) {
+    rect.size.height = newHeight;
+  }
+
+  [layer setTextBehaviour:1]
+  [layer setHeightIsClipped:true];
+  [layer setRect:rect];
+}

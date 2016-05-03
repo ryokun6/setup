@@ -1,0 +1,30 @@
+{
+  "name": "Craft",
+  "description": "Craft",
+  "author": "InVision LABS",
+  "version": "1.1.0",
+  "identifier": "com.invision.panels",
+  "compatibleVersion": 3,
+  "commands": [
+    {
+      "name": "Toggle Craft",
+      "identifier": "toggle-panels",
+      "shortcut": "cmd p",
+      "script": "panels.cocoascript",
+      "handler": "togglePanels"
+    },
+    {
+      "name": "Show Craft",
+      "identifier": "show-panels",
+      "script": "panels.cocoascript",
+      "handler": "showPanels"
+    }
+  ],
+  "menu": {
+    "title": "Toggle Craft",
+    "isRoot": true,
+    "items": [
+      "toggle-panels"
+    ]
+  }
+}

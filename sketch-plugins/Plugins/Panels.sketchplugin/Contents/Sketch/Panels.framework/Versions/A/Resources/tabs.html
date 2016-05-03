@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head><style type="text/css">
+*,:after,:before{box-sizing:border-box;margin:0;padding:0;-webkit-user-select:none;font-family:Source Sans Pro,sans-serif;outline:none;cursor:default;-webkit-font-smoothing:antialiased}body{overflow:hidden;font-size:12px}input,textarea{-webkit-user-select:text;resize:none}ol,ul{list-style-type:none}[draggable=true]{-webkit-user-drag:element}.icon{width:16px;height:16px;-webkit-flex-shrink:0;flex-shrink:0}.disabled,[disabled]{pointer-events:none!important}::-webkit-scrollbar{width:15px}::-webkit-scrollbar-track{background-color:rgba(0,0,0,.08)}::-webkit-scrollbar-thumb,::-webkit-scrollbar-track{border-radius:10px;background-clip:padding-box;border:5px solid transparent}::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.2)}button.big{width:100%;line-height:47px;font-size:16px;font-weight:600}.btngroup{display:-webkit-flex}.btngroup button{-webkit-flex:1;border-radius:0;line-height:24px;height:24px;font-size:12px;padding:0!important}.btngroup button:first-child{border-radius:3px 0 0 3px}.btngroup button:last-child{border-radius:0 3px 3px 0}.btngroup button:nth-child(n+2){border-left:none!important}button{padding:0 20px;line-height:23px;border-radius:3px;background-color:#f2f2f2;border:1px solid #c7c7c7;color:inherit}button:hover{background:#fff}button.blue{background-color:#3183fe;border-color:#0d70bf;text-shadow:0 1px 0 rgba(0,0,0,.2)}button.active{border:1px solid #307def}button.active,button.blue{color:#fff}button.active,button.blue:hover{background-color:#4e95ff}button:not(.active):active:hover{background:hsla(0,0%,100%,.85)}button.blue:active:hover{background-color:#2571e2;box-shadow:inset 0 1px 0 rgba(0,0,0,.18)}hr{width:100%;height:1px;margin:15px 0;border:none;background-color:#c7c7c7}.divider{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;color:#999;margin:10px 0}.divider:after,.divider:before{height:1px;background-color:#c7c7c7;content:'';display:block;-webkit-flex:1;flex:1}.divider:before{margin-right:7px}.divider:after{margin-left:7px}.btngroup button.active:nth-child(n+2){box-shadow:-1px 0 #307def}input{width:100%;height:23px;padding:0 10px}textarea{padding:5px 10px;resize:none}input,textarea{background-color:#fff;border:1px solid #c7c7c7;border-radius:3px;color:#6e6e6e!important;transition:box-shadow .2s}input.invalid,input:invalid,textarea.invalid,textarea:invalid{box-shadow:0 0 0 3px #df4574}input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{color:rgba(51,51,51,.4)}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}input[type=checkbox]{-webkit-appearance:none;width:12px;height:12px;border-radius:2px;padding:0;transition:border-color .2s}input[type=checkbox]:focus{border-color:#999}input:checked{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><path fill="none" stroke="#6e6e6e" stroke-width="2" d="M9 4.2L5.5 8L3 5.7"/></svg>');background-position:-1px -1px}.logo{opacity:.5}.labs{width:106px;height:18px;margin:20px auto 0;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAAAkCAMAAADGkuQzAAAAYFBMVEVMaXGqqqqqqqqqqqqpqamqqqqpqampqamqqqqqqqqgoKCpqampqamqqqqpqamqqqqoqKiqqqqlpaWpqamoqKinp6epqamOjo6pqampqampqamnp6eoqKiqqqqqqqqqqqqtX/cNAAAAH3RSTlMApMO8S/Fb3fqYCOustDJ3VdIOjSYbbANiPIEUROTJFp1v1AAABIRJREFUeAHt14eWosoCRuFNEIqM5CD+7/+WZ8S6grSu5YnXG/bM9NDVhPpIq+XfXQZwSYEUwAOyGDteOWk6AJTr1zZNs+axfsbX5gL4y2AnGeW06WN8CGAGCDqANKf1Huu7346a3NZes4ku2FAdsKG89Z9d//tRRZ7eUb1HVj3G4zpzxg3lPq3//SjqYEUR5ek2DsxufLhSdv3y+1HErsu6eB628aqHdH6gspZqW//8/SjGkFtxMm/jpVs7NQ9U7tbeZb/+t9aukgq7BPNunLi5f1tV9tuY3fr/I/2///f/QtuFH2XhrZytc/ivzmlXsRUHzjU8e1POVySbz7FWaxNbJ+1KSrB1iWxn/7tRnZ3mEbUVsBZn2hX134zydK95izrN3HL0VPrFqMroXvEWpQ7gokMD1a/4yyq2u8WR86dQgWzX96gUINVzXoUkmevQfx1qm2v7FuUChHrKiUFJuNwWvw0Vb4DuLcr7OVgDKIDZkfIvQ/mHqR9Rm2DRlumwKKiMOiDu0qs3zUAdjcAYRTlwiSagqV3XfgyNmrhwvR6qIrumQQ/QD9nVGbsnVFu73lTBEE3cN6w/RkV6ZKo3KNMcn6mSDUWiAtqzbiU5eIruO67tOcc3MkYq1uHBlRJoFukkZf1j19ke5SWSdK4o7Xs5VPQpqk+0FbxBdRzffkndPFDNavQU+vPoaqkoFALLYs6rOKA9qY77wCi/oRITlT5c5bXkiToIpLptau1RSvN2MKrpF01ALuWfokbtSl+izLAdacsUgLqmGRYlFbl0AWaj4bbckstx1/80WyWZ6htKpT1wi32OPF0BvD3qVAG1EpgUrotnPkXV2nWKX6EU5qz10fFB01oyQqdTf5+YA4sCJg2TBgpdbxq3/FUqD6I7kELJbWySsffv4UXh2pujpZVG+kXdx6hQ+/yXKCUt98bUaGtESXjOihmYtNjZrBN3cNVclJJpgrNsLkTKDmcT7I0/7FEpj3suU8QoM3+KavRUdEAdx+GyU6UowNZZVKoMSoWVWYhN0p+Uw1VZuXbZo8LyHhgNP1CeRTXgK+kjpXyKKvRU0r9GJdj8/U/CHcqXZoCzaqiMAkXgKVDS2ymubahuu9kJVQNMe1R4Z5oY+kWXRD7vUVm01rB21XPja5Rm1gajXWaHihPVd9sFcOXJh0LrI0Zpd9zHG6o1KrhV3caWCuJwj9II8VXuXZvZ833o5exbHarfoFpuTXrqtEMxSNnkGKV2RVNBLq1r9J5MVBROMlqUXScriigsoDEKpzo87VHmFE1XybcnQDWfojodCl+jTLy9/La8Pcp+gIxiWDUewGKvcRwZSUqaHYpuPYoJgPK26OV7VJBuv7iQSc3HKE/H8ve/0A46FJDPbMWXwG9Z6/N8XWrynHuzP/h5D7R5s9ugHCtuVX6Qw/ajJo9pgnLmXq0rn6Jmo2PTS1TAehMdpD3/UHGi4WNUoB+dX6G8/sXH+fP8j5kiJdXHqFQ/a36i0grbsMhmoph/pnIxMj6fouKTflY8o06hc2ErLp3QKHGnFuA32HvclGz4HaAAAAAASUVORK5CYII=);background-size:100%}.path{display:-webkit-flex;display:flex}.path button{width:27px;height:23px;margin-left:5px;padding:0;background-color:#cbcbcb;border:1px solid #a9a9a9}.path button:active:hover{background-color:#bfbfbf}.path button:before{position:relative;top:-4px;content:'...';color:#333;font-size:17px;font-weight:400}
+</style>
+</head>
+<html>
+<body>
+  <div class="btngroup" id="btngroup"></div>
+
+  <script type="text/javascript">
+  var btngroup = document.getElementById('btngroup');
+  var activeButton = null;
+
+  function makeActive(button) {
+    if (activeButton) {
+      activeButton.classList.remove('active');
+    }
+    button.classList.add('active');
+    activeButton = button;
+  }
+
+  function createButton(item, index, isActive) {
+    var button = document.createElement('button');
+    button.innerHTML = item.title;
+
+    if (isActive) {
+      makeActive(button);
+    }
+
+    button.addEventListener('click', function() {
+      makeActive(button);
+      Panels.call_(index.toString());
+    });
+
+    btngroup.appendChild(button);
+  }
+
+  for (var i = 0, len = items.length; i < len; i++) {
+    var item = items[i];
+    createButton(item, i, i === activeTabIndex);
+  };
+
+  </script>
+</body>
+</html>

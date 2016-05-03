@@ -1,0 +1,56 @@
+{
+  "name": "Photos",
+  "version": "1.0.0",
+  "controllerClass": "PhotosViewController",
+  "identifier": "com.invisionlabs.photos",
+  "width": 290,
+  "height": 390,
+  "commands": [
+    {
+      "name": "Open folder dialog",
+      "identifier": "open-folder-dialog",
+      "script": "panel.cocoascript",
+      "handler": "openFolderDialog"
+    },
+    {
+      "name": "Do Magic",
+      "identifier": "do-magic",
+      "script": "panel.cocoascript",
+      "handler": "doMagic"
+    },
+    {
+      "name": "Folder",
+      "identifier": "folder",
+      "handler": "runFolder",
+      "shortcut": "ctrl shift 1",
+      "script": "panel.cocoascript"
+    },
+    {
+      "name": "Dropbox Link",
+      "identifier": "dropbox",
+      "handler": "runDropbox",
+      "shortcut": "ctrl shift 2",
+      "script": "panel.cocoascript"
+    },
+    {
+      "name": "Random Unsplash",
+      "identifier": "unsplash",
+      "handler": "runUnsplash",
+      "shortcut": "ctrl shift 3",
+      "script": "panel.cocoascript"
+    },
+    {
+      "name": "Fill images",
+      "identifier": "fill-images",
+      "script": "panel.cocoascript",
+      "handler": "fillImages"
+    }
+  ],
+  "menu": {
+    "items": [
+      "folder",
+      "dropbox",
+      "unsplash"
+    ]
+  }
+}

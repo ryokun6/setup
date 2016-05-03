@@ -1,0 +1,28 @@
+{
+  "name": "Type",
+  "version": "1.0.1",
+  "controllerClass": "TypeViewController",
+  "identifier": "com.invisionlabs.type",
+  "width": 290,
+  "height": 450,
+  "commands": [
+    {
+      "name": "Fill text",
+      "identifier": "fill-text",
+      "script": "panel.cocoascript",
+      "handler": "fillText"
+    },
+    {
+      "name": "Layers count",
+      "identifier": "layers-count",
+      "script": "panel.cocoascript",
+      "handler": "layersCount"
+    }
+  ],
+  "actions": [
+    {
+      "icon": "Edit.tiff",
+      "identifier": "edit"
+    }
+  ]
+}

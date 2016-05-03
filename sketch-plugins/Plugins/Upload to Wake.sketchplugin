@@ -1,0 +1,103 @@
+// (cmd shift w)
+//
+// Upload to Wake
+//
+// Upload the current artboard or page to Wake.
+//
+// Copyright (c) 2015 Mike Gowen, Delighted Inc.
+//
+// Adapted to Wake
+
+var doc = context.document;
+var currentPage = [doc currentPage];
+var currentPageBounds = [currentPage absoluteRect];
+var currentArtboard = [[doc currentPage] currentArtboard];
+var selection = context.selection;
+
+
+if ([selection count] == 0) {
+    
+  saveFileAndSendToWakeApp(currentPage);
+} else if ([selection count] == 1) {
+  if (currentArtboard) {
+    saveFileAndSendToWakeApp(currentArtboard);
+  } else {
+    
+    saveFileAndSendToWakeApp(currentPage);
+  }
+} else {
+  var uniqueArtboards = getUniqueArtboards(selection);
+  if ([uniqueArtboards count] == 0) {
+    
+    saveFileAndSendToWakeApp(currentPage);
+  } else if ([uniqueArtboards count] == 1) {
+    saveFileAndSendToWakeApp(currentArtboard);
+  } else {
+    [doc showMessage:"Please upload a single artboard or page at a time."];
+  }
+}
+
+function getUniqueArtboards(selection) {
+  var uniqueArtboards = [NSMutableArray array];
+  var loop = [selection objectEnumerator];
+  
+  while (selectionItem = [loop nextObject]) {
+    var parent = [selectionItem parentGroup];
+    var parentClass = [parent class];
+    while (parentClass != "MSPage") {
+      if (parentClass == "MSArtboardGroup" && ![uniqueArtboards containsObject:parent]) {
+        [uniqueArtboards addObject:parent];
+      }
+      parent = [parent parentGroup];
+      parentClass = [parent class];
+    }
+  }
+  return uniqueArtboards;
+}
+
+function saveFileAndSendToWakeApp(target) {
+  var path = getPath(target);
+  saveFile(target, path);
+  sendToWakeApp(target, path);
+}
+
+function getPath(target) {
+  var fileManager = [NSFileManager defaultManager];
+  var cachesURL = [[fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] lastObject];
+  directory = [[cachesURL URLByAppendingPathComponent:"io.wake.upload-to-wake"] path];
+  var fullPath = directory + "/" + [target name] + ".png";
+  return fullPath;
+}
+
+function saveFile(target, path) {
+    
+  if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+  }
+    
+  if ([target class] == "MSPage") {
+    var targetBounds = [target contentBounds];
+    var targetBoundsClassName = ([targetBounds respondsToSelector:NSSelectorFromString("name")]? [targetBounds name] : nil);
+    var rect = targetBounds;
+    if (targetBoundsClassName == "CGRect") { // in case of v3.4+
+      rect = [GKRect new];
+      rect.x = targetBounds.origin.x;
+      rect.y = targetBounds.origin.y;
+      rect.width = targetBounds.size.width;
+      rect.height = targetBounds.size.height;
+    }
+    [doc saveArtboardOrSlice:rect toFile:path];
+  } else {
+    [doc saveArtboardOrSlice:target toFile:path];
+  }
+}
+
+function sendToWakeApp(target, path) {
+  var success = [[NSWorkspace sharedWorkspace] openFile:path withApplication:"Wake"]];
+  if(success) {
+    var targetName = [target name];
+    [doc showMessage:"Uploading \"" + targetName + "\""];
+  } else {
+    [doc showMessage:"Wake is not installed."];
+  }
+}

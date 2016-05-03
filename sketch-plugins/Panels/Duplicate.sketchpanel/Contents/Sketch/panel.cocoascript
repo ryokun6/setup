@@ -1,0 +1,557 @@
+@import 'photos.js';
+
+var IDENTIFIER = 'com.invisionlabs.duplicate';
+
+var changeButton = function(context) {
+  var panelsManager = [PanelsManager sharedManager];
+  var selection = context.selection;
+  var command = context.command;
+  var selectionCount = [selection count];
+
+  if (selectionCount == 1) {
+    var layer = [selection firstObject];
+    var data = getArgs(command, layer)
+    if (data) {
+      [panelsManager jsonCallback:data forIdentifier:IDENTIFIER];
+    } else {
+      callback(panelsManager, IDENTIFIER, null);
+    }
+  } else {
+    callback(panelsManager, IDENTIFIER, null);
+  }
+}
+
+var duplicateSpecificCount = function(context) {
+  var doc = context.document;
+  var selection = context.selection;
+  var selectionCount = [selection count];
+  var panelsManager = [PanelsManager sharedManager];
+  var arguments = [panelsManager commandArguments];
+
+  var layer;
+  if (selectionCount > 1) {
+    layer = groupSelection(doc);
+  } else if (selectionCount == 1) {
+    layer = [selection firstObject];
+  } else {
+    callback(panelsManager, IDENTIFIER, null);
+    return noSelectionAlert();
+  }
+
+  var horizontal = arguments.horizontal;
+  var vertical = arguments.vertical;
+  var canDuplicate = false;
+
+  var horizontalCount = verticalCount = 1;
+  var horizontalMargin = verticalMargin = 0;
+
+  if (horizontal) {
+    canDuplicate = true;
+    horizontalCount = [[horizontal valueForKey:'count'] intValue];
+    horizontalMargin = [[horizontal valueForKey:'gutter'] intValue];
+  }
+
+  if (vertical) {
+    canDuplicate = true;
+    verticalCount = [[vertical valueForKey:'count'] intValue];
+    verticalMargin = [[vertical valueForKey:'gutter'] intValue];
+  }
+
+  if (canDuplicate) {
+    var duplicatedLayers = duplicate(layer, horizontalCount, horizontalMargin, verticalCount, verticalMargin, null);
+    fillContent(context, panelsManager, layer, duplicatedLayers);
+  }
+  callback(panelsManager, IDENTIFIER, null);
+};
+
+function getArgs(command, layer) {
+  var ret = [command valueForKey:'args' onLayer:layer forPluginIdentifier:IDENTIFIER];
+  if (ret) {
+    return ret;
+  } else {
+    return [command valueForKey:'args' onLayer:layer];
+  }
+}
+
+var duplicateInsideSelection = function(context) {
+  var doc = context.document;
+  var command = context.command;
+  var selection = context.selection;
+  var selectionCount = [selection count];
+  var panelsManager = [PanelsManager sharedManager];
+  var arguments = [panelsManager commandArguments];
+
+  var layer;
+
+  if (selectionCount == 0) {
+    callback(panelsManager, IDENTIFIER, null);
+    return noSelectionAlert();
+  } else if (selectionCount > 1) {
+    layer = groupSelection(doc);
+  } else {
+    layer = [selection firstObject];
+  }
+
+  if (!isSelectionLayer(command, layer)) {
+    if (!arguments) {
+      return;
+    }
+
+    var args = getInsideSelectionArgs(arguments);
+
+    layer = createSelectionLayer(doc, args, layer);
+
+    if (args.stopAtSelectionEnd) {
+      toggleClipping(doc, layer);
+    }
+
+    [command setValue:args forKey:'args' onLayer:layer forPluginIdentifier:IDENTIFIER];
+  }
+
+  var args;
+  var oldArgs;
+  if (arguments) {
+    args = getInsideSelectionArgs(arguments);
+    if (args.stopAtSelectionEnd != [layer hasClippingMask]) {
+      toggleClipping(doc, layer);
+    }
+    oldArgs = getArgs(command, layer);
+    [command setValue:args forKey:'args' onLayer:layer forPluginIdentifier:IDENTIFIER];
+  } else {
+    args = getArgs(command, layer);
+    oldArgs = args;
+  }
+
+  var roundFunc;
+  if (args.stopAtSelectionEnd == true) {
+    roundFunc = Math.ceil;
+  } else {
+    roundFunc = Math.floor;
+  }
+
+  var group = [layer parentGroup];
+  var layers = [group layers];
+
+  var selectionLayerFrame = [layer frame];
+  var selectionLayerID = [layer objectID];
+
+  var itemLayer = findLeftTopLayer(layers, selectionLayerID);
+  var itemFrame = [itemLayer frame];
+
+  var horizontalMargin = get(args, 'horizontal', 0);
+  var verticalMargin = get(args, 'vertical', 0);
+
+  var itemWidth = [itemFrame width] + horizontalMargin;
+  var itemHeight = [itemFrame height] + verticalMargin;
+
+  var oldItemWidth = [itemFrame width] + get(oldArgs, 'horizontal', 0);
+  var oldItemHeight = [itemFrame height] + get(oldArgs, 'vertical', 0);
+
+  var horizontalCount;
+  if (args.horizontal != null) {
+    horizontalCount = roundFunc([selectionLayerFrame width] / itemWidth);
+  } else {
+    horizontalCount = 1;
+  }
+
+  var verticalCount;
+  if (args.vertical != null) {
+    verticalCount = roundFunc([selectionLayerFrame height] / itemHeight)
+  } else {
+    verticalCount = 1;
+  }
+
+  var grid = getCurrentGrid(layers, selectionLayerID, horizontalCount, verticalCount, oldItemWidth, oldItemHeight);
+
+  var gridHorizontalCount = grid.length;
+  var gridVerticalCount = grid[0].length;
+
+  horizontalCount = Math.max(horizontalCount, gridHorizontalCount);
+  verticalCount = Math.max(verticalCount, gridVerticalCount);
+
+  var duplicatedLayers = duplicate(itemLayer, horizontalCount, horizontalMargin, verticalCount, verticalMargin, grid);
+
+  fillContent(context, panelsManager, itemLayer, duplicatedLayers);
+}
+
+function isSelectionLayer(command, layer) {
+  return getArgs(command, layer) != null;
+}
+
+function get(obj, key, defaultValue) {
+  var value = obj[key];
+  if (value == null) {
+    value = defaultValue;
+  }
+  return value;
+}
+
+function getInsideSelectionArgs(arguments) {
+  var args = {};
+  var horizontal = arguments.horizontal;
+  var vertical = arguments.vertical;
+  var stopAtSelectionEnd = arguments.stopAtSelectionEnd;
+
+  if (horizontal) {
+    args.horizontal = [[horizontal valueForKey:'gutter'] intValue];
+  }
+
+  if (vertical) {
+    args.vertical = [[vertical valueForKey:'gutter'] intValue];
+  }
+
+  args.stopAtSelectionEnd = true;
+  // if (stopAtSelectionEnd) {
+  //   args.stopAtSelectionEnd = [stopAtSelectionEnd boolValue];
+  // } else {
+  //   args.stopAtSelectionEnd = false;
+  // }
+
+  return args;
+}
+
+function getCurrentGrid(layers, selectionLayerID, horizontalCount, verticalCount, itemWidth, itemHeight) {
+  var grid = [];
+
+  for (var i = 0; i < horizontalCount; i++) {
+    grid[i] = [];
+    for (var j = 0; j < verticalCount; j++) {
+      grid[i][j] = null;
+    }
+  }
+
+  for (var i = [layers count] - 1; i >= 0; i--) {
+    var layer = [layers objectAtIndex:i];
+
+    if ([layer objectID] == selectionLayerID) {
+      continue;
+    }
+
+    var layerFrame = [layer frame];
+    var xPosition = [layerFrame x] / itemWidth;
+    var yPosition = [layerFrame y] / itemHeight;
+    var gridX = grid[xPosition];
+
+    if (yPosition >= verticalCount || xPosition >= horizontalCount) {
+      [layer setIsVisible:false];
+    } else {
+      [layer setIsVisible:true];
+
+      if (!gridX) {
+        gridX = [];
+        grid[xPosition] = gridX;
+      }
+
+      gridX[yPosition] = layer;
+    }
+  }
+  return grid;
+}
+
+function createSelectionLayer(doc, args, selectedLayer) {
+  var group = groupSelection(doc)
+
+  var selectionLayer = [group addLayerOfType:'rectangle'];
+  [selectionLayer setName:'Duplicate control'];
+  [selectionLayer moveToLayer:group beforeLayer:[group firstLayer]];
+  var frame = [selectedLayer frame];
+
+  var width = [frame width];
+  var height = [frame height];
+
+  if (args.horizontal != undefined) {
+    width = (width + args.horizontal) * 3;
+  }
+
+  if (args.vertical != undefined) {
+    height = (height + args.vertical) * 3;
+  }
+
+  var selectionLayerFrame = [selectionLayer frame];
+  [selectionLayerFrame setWidth:width];
+  [selectionLayerFrame setHeight:height];
+
+  return selectionLayer;
+}
+
+function findLeftTopLayer(layers, selectionLayerID) {
+  var minX = Infinity;
+  var minY = Infinity;
+  var leftTopLayer = null;
+
+  for (var i = [layers count] - 1; i >= 1; i--) {
+    var layer = [layers objectAtIndex:i];
+
+    if ([layer objectID] == selectionLayerID) {
+      continue;
+    }
+
+    var rect = [layer rect];
+    var x = rect.origin.x;
+    var y = rect.origin.y;
+
+    if (x < minX && y < minY) {
+      minX = minX;
+      minY = minY;
+      leftTopLayer = layer
+    }
+  }
+
+  return leftTopLayer;
+}
+
+function groupSelection(doc) {
+  var action = [[doc actionsController] actionWithName:'MSGroupAction'];
+  [action group:nil];
+
+  return [[doc selectedLayers] firstObject];
+}
+
+function noSelectionAlert() {
+  var alert = [[NSAlert alloc] init];
+  [alert setAlertStyle:NSWarningAlertStyle];
+  [alert setMessageText:'Please select at least one layer to duplicate.'];
+  [alert runModal];
+}
+
+function duplicate(layer, horizontalCount, horizontalMargin, verticalCount, verticalMargin, grid) {
+  var frame = [layer frame];
+  var layerRect = [layer rect];
+  horizontalMargin = [frame width] + horizontalMargin;
+  verticalMargin = [frame height] + verticalMargin;
+
+  var duplicatedLayer, rect, duplicatedLayers = [];
+
+  for (var i = 0; i < horizontalCount; i++) {
+    for (var j = 0; j < verticalCount; j++) {
+      if (!(i == 0 && j == 0)) {
+        duplicatedLayer = null;
+        rect = null;
+
+        if (grid) {
+          duplicatedLayer = grid[i][j];
+          if (duplicatedLayer) {
+            rect = [duplicatedLayer rect];
+            rect.origin.x = layerRect.origin.x + horizontalMargin * i;
+            rect.origin.y = layerRect.origin.y + verticalMargin * j;
+          }
+        }
+
+        if (!duplicatedLayer) {
+          duplicatedLayer = [layer duplicate];
+          rect = [duplicatedLayer rect];
+          rect.origin.x = rect.origin.x + horizontalMargin * i;
+          rect.origin.y = rect.origin.y + verticalMargin * j;
+          duplicatedLayers.push(duplicatedLayer);
+        }
+
+        [duplicatedLayer setRect:rect];
+      }
+    }
+  }
+
+  return duplicatedLayers;
+}
+
+function callback(panelsManager, identifier, data) {
+  var jsonData = JSON.stringify(data);
+  [panelsManager callback:jsonData forIdentifier:identifier];
+}
+
+function errorCallback(panelsManager, identifier, message) {
+  var jsonData = JSON.stringify({
+    error: message
+  });
+  [panelsManager callback:jsonData forIdentifier:identifier];
+}
+
+function duplicatePhotos(panelsManager, doc, pluginFolderPath, layers, settings) {
+  var folderPath = [settings valueForKey:'folder'];
+  var link = [settings valueForKey:'link'];
+  var mode = [settings valueForKey:'mode'];
+  var category = [settings valueForKey:'category'];
+  var resourcesFolder = [pluginFolderPath stringByDeletingLastPathComponent] + '/Resources';
+  var layer;
+
+  for (var i = 0, len = layers.length; i < len; ++i) {
+    layer = layers[i];
+    setFill(layer, resourcesFolder + '/placeholder.png');
+  }
+
+  if (mode == 'link' || mode == 'dropbox') {
+    doc.showMessage('Downloading image from Dropbox. It may take some time');
+    dropbox(panelsManager, layers, link, IDENTIFIER);
+  } else if (mode == 'unsplash') {
+    doc.showMessage('Downloading image from Unsplash. It may take some time');
+    unsplash(panelsManager, layers, category, IDENTIFIER);
+  } else {
+    var error = folder(layers, folderPath);
+    if (error) {
+      errorCallback(panelsManager, IDENTIFIER, error);
+    } else {
+      callback(panelsManager, IDENTIFIER, null);
+    }
+
+  }
+}
+
+function duplicateType(jsContext, layers, action) {
+  var generateFn = jsContext['generator']['generate'];
+  var res = [generateFn callWithArguments:[action, layers.length]];
+  var words = [res toArray];
+  var wordsCount = [words count];
+
+  var layer, item;
+
+  for (var i = 0, len = layers.length; i < len; i++) {
+    layer = layers[i];
+    item = [words objectAtIndex:i % wordsCount];
+    setText(layer, item);
+  }
+}
+
+function duplicateSymbolType(jsContext, layers, layerId, action) {
+  var generateFn = jsContext['generator']['generate'];
+  var res = [generateFn callWithArguments:[action, layers.length]];
+  var words = [res toArray];
+  var wordsCount = [words count];
+
+  var layer, item;
+
+  for (var i = 0, len = layers.length; i < len; i++) {
+    layer = layers[i];
+    item = [words objectAtIndex:i % wordsCount];
+    [layer addOverrides:item forCellAtIndex:0 ancestorIDs:[layerId]];
+  }
+}
+
+function duplicateSymbolPhotos(panelsManager, doc, layers, layerId, settings) {
+  var folderPath = [settings valueForKey:'folder'];
+  var link = [settings valueForKey:'link'];
+  var mode = [settings valueForKey:'mode'];
+
+  if (mode == 'link' || mode == 'dropbox') {
+    doc.showMessage('Downloading image from Dropbox. It may take some time');
+    // dropbox(panelsManager, layers, link, IDENTIFIER);
+  } else if (mode == 'unsplash') {
+    doc.showMessage('Downloading image from Unsplash. It may take some time');
+    // unsplash(panelsManager, layers, IDENTIFIER);
+  } else {
+    var error = folderSymbol(layers, layerId, folderPath);
+    if (error) {
+      errorCallback(panelsManager, IDENTIFIER, error);
+    } else {
+      callback(panelsManager, IDENTIFIER, null);
+    }
+
+  }
+}
+
+function fillSymbolInstances(context, panelsManager, layer, duplicatedSymbolInstances) {
+  var scriptPath = context.scriptPath;
+  var command = context.command;
+  var doc = context.document;
+  var callCallback = true;
+
+  var pluginFolderPath = [scriptPath stringByDeletingLastPathComponent];
+  var generatorScriptPath = pluginFolderPath + '/generator.js';
+  var scriptString = [NSString stringWithContentsOfFile:generatorScriptPath encoding:NSUTF8StringEncoding error:nil];
+  var jsContext = [[JSContext alloc] init];
+  [jsContext evaluateScript:scriptString];
+
+  var layers = [[layer masterArtboard] children];
+
+  for (var i = 0, len = [layers count]; i < len; ++i) {
+    var layer = [layers objectAtIndex:i];
+    var layerClass = [layer class];
+    if (layerClass == 'MSTextLayer' || layerClass == 'MSShapeGroup') {
+      var typeDuplicate = [command valueForKey:'type-duplicate' onLayer:layer forPluginIdentifier:IDENTIFIER];
+      var photosDuplicate = [command valueForKey:'photos-duplicate' onLayer:layer forPluginIdentifier:IDENTIFIER];
+
+      if (typeDuplicate) {
+        duplicateSymbolType(jsContext, duplicatedSymbolInstances, [layer objectID], typeDuplicate);
+      } else if (photosDuplicate) {
+        duplicateSymbolPhotos(panelsManager, doc, duplicatedSymbolInstances, [layer objectID], photosDuplicate);
+        callCallback = false;
+      }
+    }
+  }
+
+  if (callCallback) {
+    callback(panelsManager, IDENTIFIER, null);
+  }
+}
+
+function fillContent(context, panelsManager, layer, duplicatedLayers) {
+  if (!duplicatedLayers.length) {
+    callback(panelsManager, IDENTIFIER, null);
+    return;
+  }
+
+  if ([layer class] == 'MSSymbolInstance') {
+    return fillSymbolInstances(context, panelsManager, layer, duplicatedLayers);
+  }
+
+  var scriptPath = context.scriptPath;
+  var command = context.command;
+  var doc = context.document;
+  var callCallback = true;
+
+  var pluginFolderPath = [scriptPath stringByDeletingLastPathComponent];
+  var generatorScriptPath = pluginFolderPath + '/generator.js';
+  var scriptString = [NSString stringWithContentsOfFile:generatorScriptPath encoding:NSUTF8StringEncoding error:nil];
+  var jsContext = [[JSContext alloc] init];
+  [jsContext evaluateScript:scriptString];
+
+  var duplicatedLayersChildren = []
+  for (var i = 0, len = duplicatedLayers.length; i < len; ++i) {
+    var duplicatedLayer = duplicatedLayers[i];
+    var duplicatedLayerChildren = [duplicatedLayer children];
+
+    for (var j = 0, jLen = [duplicatedLayerChildren count]; j < jLen; ++j) {
+      var duplicatedLayerChild = [duplicatedLayerChildren objectAtIndex:j]
+      var items = duplicatedLayersChildren[j];
+      if (!items) {
+        items = [];
+        duplicatedLayersChildren[j] = items;
+      }
+      items.push(duplicatedLayerChild);
+    }
+  }
+
+  var layers = [layer children];
+  for (var i = 0, len = [layers count]; i < len; ++i) {
+    var layer = [layers objectAtIndex:i];
+    var layerClass = [layer class];
+    if (layerClass == 'MSTextLayer' || layerClass == 'MSShapeGroup') {
+      var typeDuplicate = [command valueForKey:'type-duplicate' onLayer:layer forPluginIdentifier:IDENTIFIER];
+      var photosDuplicate = [command valueForKey:'photos-duplicate' onLayer:layer forPluginIdentifier:IDENTIFIER];
+
+      if (typeDuplicate) {
+        duplicateType(jsContext, duplicatedLayersChildren[i], typeDuplicate);
+      } else if (photosDuplicate) {
+        duplicatePhotos(panelsManager, doc, pluginFolderPath, duplicatedLayersChildren[i], photosDuplicate);
+        callCallback = false;
+      }
+    }
+  }
+
+  if (callCallback) {
+    callback(panelsManager, IDENTIFIER, null);
+  }
+}
+
+function setText(layer, value) {
+  [layer prepareForUndo];
+  [layer setIsEditingText:true];
+  [layer setStringValue:value];
+  [layer setIsEditingText:false];
+  [layer finishEditing];
+}
+
+function toggleClipping(doc, layer) {
+  var originalName = [layer name];
+  var action = [[doc actionsController] actionWithName:'MSClippingMaskAction'];
+  [action clippingMask:nil];
+  [layer setName:originalName];
+}

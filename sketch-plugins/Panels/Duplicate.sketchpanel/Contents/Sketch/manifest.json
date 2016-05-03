@@ -1,0 +1,35 @@
+{
+  "name": "Duplicate",
+  "version": "1.0.0",
+  "identifier": "com.invisionlabs.duplicate",
+  "width": 260,
+  "height": 370,
+  "commands": [
+    {
+      "name": "Duplicate specific count",
+      "identifier": "duplicate-specific-count",
+      "script": "panel.cocoascript",
+      "handler": "duplicateSpecificCount"
+    },
+    {
+      "name": "Duplicate inside selection",
+      "identifier": "duplicate-inside-selection",
+      "shortcut": "cmd ctrl p",
+      "script": "panel.cocoascript",
+      "handler": "duplicateInsideSelection",
+      "runOnLayerResizeFinished": true
+    },
+    {
+      "name": "Change duplicate button",
+      "identifier": "duplicate-change-button",
+      "script": "panel.cocoascript",
+      "handler": "changeButton",
+      "runOnSelectionChange": true
+    }
+  ],
+  "menu": {
+    "items": [
+      "duplicate-inside-selection"
+    ]
+  }
+}

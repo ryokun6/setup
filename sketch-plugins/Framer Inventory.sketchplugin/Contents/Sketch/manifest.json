@@ -1,0 +1,69 @@
+{
+  "name" : "Framer Inventory",
+  "author" : "Timur Nurutdinov",
+  "authorEmail" : "addleimb@gmail.com",
+  "description": "Export FramerJS layers & states from Sketch",
+  "homepage": "https://github.com/timurnurutdinov/Framer-Inventory",
+  "identifier": "com.tilllur.framer-inventory",
+  "version": "2.0.0",
+  "compatibleVersion": 3.5,
+  "commands" : [
+    {
+      "script" : "choose-replicate-layers.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "◉   Replicate Layers",
+      "identifier" : "choose-replicate-layers"
+    },
+    {
+      "script" : "choose-generate-states.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "◉   Generate States",
+      "identifier" : "choose-generate-states"
+    },
+    {
+      "script" : "choose-simulate-keynote.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "◎   Simulate Keynote",
+      "identifier" : "choose-simulate-keynote"
+    },
+    {
+      "script" : "choose-testing-environment.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "Run testing environment",
+      "identifier" : "choose-testing-environment"
+    },
+    {
+      "script" : "choose-settings.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "Settings",
+      "identifier" : "choose-settings"
+    },
+    {
+      "script" : "choose-remove-export-page.cocoascript",
+      "handler" : "onRun",
+      "shortcut" : "",
+      "name" : "Remove Export Page",
+      "identifier" : "choose-remove-export-page"
+    }
+  ],
+  "menu": {
+	  "title": "Framer Inventory",
+      "items": [
+		  "choose-simulate-keynote",
+		  "choose-generate-states",
+		  "choose-replicate-layers",
+		  {
+		         "title": "      Utils",
+		         "items": [
+				 	"choose-settings",
+					"choose-remove-export-page"
+		         ],
+		  }
+      ]
+    }
+}
